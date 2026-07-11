@@ -144,6 +144,14 @@ export class Host {
             const customization = getDeviceCustomization(this.hostId);
             const settings = getLocalStreamSettings(this.role ? this.role.default_settings : globalDefaultSettings());
             const url = customization.bootApiUrl || settings.deviceStartApiUrl;
+            
+            const isOnline = this.isCustomOnline !== undefined ? this.isCustomOnline : (this.cache && this.cache.server_state != null);
+            if (isOnline === true) {
+                this.startFastPolling("shutdown");
+            } else {
+                this.startFastPolling("booting");
+            }
+            
             this.runSecretApi(url);
         });
 
@@ -154,6 +162,9 @@ export class Host {
             const customization = getDeviceCustomization(this.hostId);
             const settings = getLocalStreamSettings(this.role ? this.role.default_settings : globalDefaultSettings());
             const url = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
+            
+            this.startFastPolling("shutdown");
+            
             this.runSecretApi(url);
         });
         
@@ -349,13 +360,15 @@ export class Host {
                     parsed = text;
                 }
                 showNotification(`API Response: ${typeof parsed === "object" ? JSON.stringify(parsed) : parsed}`, "info");
-                this.checkStatus();
-                setTimeout(() => this.checkStatus(), 2000);
+                if (this.isCustomOnline !== "booting") {
+                    this.checkStatus();
+                }
             }
             catch (err) {
                 showNotification(`API Error: ${err.message || err}`, "error");
-                this.checkStatus();
-                setTimeout(() => this.checkStatus(), 2000);
+                if (this.isCustomOnline !== "booting") {
+                    this.checkStatus();
+                }
             }
         });
     }
@@ -533,9 +546,51 @@ export class Host {
     cleanupCustomStatus() {
         if (this.statusInterval) {
             clearInterval(this.statusInterval);
+            clearTimeout(this.statusInterval);
             this.statusInterval = null;
         }
         this.stopUptimeTimer();
+    }
+    startFastPolling(reason) {
+        if (this.statusInterval) {
+            clearInterval(this.statusInterval);
+            clearTimeout(this.statusInterval);
+            this.statusInterval = null;
+        }
+        const customization = getDeviceCustomization(this.hostId);
+        if (!customization.statusApiUrl) return;
+        
+        let attempts = 0;
+        const maxAttempts = reason === "booting" ? 40 : 15;
+        const delay = reason === "booting" ? 3000 : 2000;
+        
+        if (reason === "booting") {
+            this.isCustomOnline = "booting";
+            this.statusIndicatorIcon.className = "host-status-custom-icon booting";
+            this.statusUptimeClock.className = "host-status-custom-clock booting";
+            this.statusUptimeClock.innerText = "Booting...";
+            this.updateButtons();
+        }
+        
+        const poll = () => __awaiter(this, void 0, void 0, function* () {
+            attempts++;
+            yield this.checkStatus();
+            
+            const currentOnline = this.isCustomOnline === true;
+            if (reason === "booting" && currentOnline) {
+                this.statusUptimeClock.className = "host-status-custom-clock";
+                this.statusInterval = setInterval(() => this.checkStatus(), 30000);
+            } else if (reason === "shutdown" && !currentOnline) {
+                this.statusInterval = setInterval(() => this.checkStatus(), 30000);
+            } else if (attempts >= maxAttempts) {
+                this.statusUptimeClock.className = "host-status-custom-clock";
+                this.statusInterval = setInterval(() => this.checkStatus(), 30000);
+            } else {
+                this.statusInterval = setTimeout(poll, delay);
+            }
+        });
+        
+        this.statusInterval = setTimeout(poll, delay);
     }
     formatDuration(totalSeconds) {
         const h = Math.floor(totalSeconds / 3600);
@@ -665,23 +720,37 @@ export class Host {
                     isOnline = parseBool(data);
                 }
                 
-                this.isCustomOnline = isOnline;
-                this.statusIndicatorIcon.className = "host-status-custom-icon " + (isOnline ? "online" : "offline");
-                
-                if (isOnline && uptimeClock) {
-                    this.startUptimeTimer(String(uptimeClock));
+                if (isOnline) {
+                    this.isCustomOnline = true;
+                    this.statusIndicatorIcon.className = "host-status-custom-icon online";
+                    this.statusUptimeClock.className = "host-status-custom-clock";
+                    if (uptimeClock) {
+                        this.startUptimeTimer(String(uptimeClock));
+                    } else {
+                        this.stopUptimeTimer();
+                        this.statusUptimeClock.innerText = "Online";
+                    }
+                    this.updateButtons();
                 } else {
-                    this.stopUptimeTimer();
-                    this.statusUptimeClock.innerText = isOnline ? "Online" : "Offline";
+                    if (this.isCustomOnline !== "booting") {
+                        this.isCustomOnline = false;
+                        this.statusIndicatorIcon.className = "host-status-custom-icon offline";
+                        this.statusUptimeClock.className = "host-status-custom-clock";
+                        this.stopUptimeTimer();
+                        this.statusUptimeClock.innerText = "Offline";
+                        this.updateButtons();
+                    }
                 }
-                this.updateButtons();
             } catch (err) {
                 console.error(`Moonlight Status check failed for host ${this.hostId}. If this is a network/fetch error, please check if CORS is enabled on your API server. Error:`, err);
-                this.isCustomOnline = false;
-                this.statusIndicatorIcon.className = "host-status-custom-icon offline";
-                this.stopUptimeTimer();
-                this.statusUptimeClock.innerText = "Offline";
-                this.updateButtons();
+                if (this.isCustomOnline !== "booting") {
+                    this.isCustomOnline = false;
+                    this.statusIndicatorIcon.className = "host-status-custom-icon offline";
+                    this.statusUptimeClock.className = "host-status-custom-clock";
+                    this.stopUptimeTimer();
+                    this.statusUptimeClock.innerText = "Offline";
+                    this.updateButtons();
+                }
             }
         });
     }
