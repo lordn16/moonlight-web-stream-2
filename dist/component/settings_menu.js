@@ -468,6 +468,13 @@ export class StreamSettingsComponent {
         settings.backgroundImageUrl = this.backgroundImageUrl.getValue();
         settings.deviceStartApiUrl = this.deviceStartApiUrl.getValue();
         settings.deviceForceShutdownApiUrl = this.deviceForceShutdownApiUrl.getValue();
+        try {
+            const raw = localStorage.getItem("mlDeviceCustomizations");
+            if (raw) {
+                settings.deviceCustomizations = JSON.parse(raw);
+            }
+        }
+        catch (e) { }
         makeSettingsValid(this.permissions, settings);
         return settings;
     }

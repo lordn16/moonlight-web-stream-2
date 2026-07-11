@@ -12,13 +12,14 @@ import { ComponentEvent } from "../index.js";
 import { Host } from "./index.js";
 import { FetchListComponent } from "../fetch_list.js";
 export class HostList extends FetchListComponent {
-    constructor(api) {
+    constructor(api, role) {
         super({
             listClasses: ["host-list"],
             elementLiClasses: ["animated-list-element", "host-element"]
         });
         this.eventTarget = new EventTarget();
         this.api = api;
+        this.role = role;
     }
     forceFetch() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -43,7 +44,7 @@ export class HostList extends FetchListComponent {
         return data.host_id;
     }
     insertList(dataId, data) {
-        const newHost = new Host(this.api, dataId, data);
+        const newHost = new Host(this.api, dataId, data, this.role);
         this.list.append(newHost);
         newHost.addHostRemoveListener(this.removeHostListener.bind(this));
         newHost.addHostOpenListener(this.onHostOpenEvent.bind(this));

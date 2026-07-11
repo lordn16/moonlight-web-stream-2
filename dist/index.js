@@ -11,6 +11,7 @@ import "./polyfill/index.js";
 import { getApi, apiPostHost, FetchError, apiLogout, apiGetUser, tryLogin, apiGetHost, apiGetRole, apiPatchRole } from "./api.js";
 import { AddHostModal } from "./component/host/add_modal.js";
 import { HostList } from "./component/host/list.js";
+import { mergeServerDeviceCustomizations } from "./component/host/device_customization.js";
 import { showNotification } from "./component/notification.js";
 import { showMessage, showModal } from "./component/modal/index.js";
 import { setContextMenu } from "./component/context_menu.js";
@@ -125,7 +126,7 @@ class MainApp {
         this.hostAddButton.title = "Add Device";
         this.hostAddButton.addEventListener("click", this.addHost.bind(this));
         // Host list
-        this.hostList = new HostList(api);
+        this.hostList = new HostList(api, bootstrapRole);
         this.hostList.addHostOpenListener(this.onHostOpen.bind(this));
         // Settings Button
         this.settingsButton.classList.add("open-settings");
@@ -137,7 +138,14 @@ class MainApp {
         this.saveRoleDefaultsButton.dataset.variant = "save-button";
         this.saveRoleDefaultsButton.title = "Save Defaults";
         // Settings
-        this.settings = new StreamSettingsComponent(bootstrapRole.permissions, getLocalStreamSettings(bootstrapRole.default_settings));
+        const mergedSettings = getLocalStreamSettings(bootstrapRole.default_settings);
+        if (mergedSettings.deviceCustomizations) {
+            mergeServerDeviceCustomizations(mergedSettings.deviceCustomizations);
+        }
+        setPageStyle(mergedSettings.pageStyle);
+        applyAppearanceSettings(mergedSettings);
+        
+        this.settings = new StreamSettingsComponent(bootstrapRole.permissions, mergedSettings);
         this.settings.addChangeListener(this.onSettingsChange.bind(this));
         this.divElement.addEventListener("close-settings", () => this.setCurrentDisplay("hosts"));
         // Append default elements

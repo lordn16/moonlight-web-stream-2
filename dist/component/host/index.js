@@ -18,7 +18,7 @@ import { getDeviceCustomization, setDeviceCustomization } from "./device_customi
 import { EditDeviceModal } from "./edit_modal.js";
 import { getLocalStreamSettings, globalDefaultSettings } from "../settings_menu.js";
 export class Host {
-    constructor(api, hostId, host) {
+    constructor(api, hostId, host, role) {
         this.userCache = null;
         this.cache = null;
         this.statusInterval = null;
@@ -34,6 +34,7 @@ export class Host {
         this.api = api;
         this.hostId = hostId;
         this.cache = host;
+        this.role = role;
         // Configure image
         this.imageElement.classList.add("host-image");
         this.imageElement.src = HOST_IMAGE;
@@ -102,7 +103,7 @@ export class Host {
         this.btnPower.addEventListener("click", (e) => {
             e.stopPropagation();
             const customization = getDeviceCustomization(this.hostId);
-            const settings = getLocalStreamSettings(globalDefaultSettings());
+            const settings = getLocalStreamSettings(this.role ? this.role.default_settings : globalDefaultSettings());
             const isOnline = this.isCustomOnline !== undefined ? this.isCustomOnline : (this.cache && this.cache.server_state != null);
             if (isOnline) {
                 const url = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
@@ -118,7 +119,7 @@ export class Host {
         this.btnForcePower.addEventListener("click", (e) => {
             e.stopPropagation();
             const customization = getDeviceCustomization(this.hostId);
-            const settings = getLocalStreamSettings(globalDefaultSettings());
+            const settings = getLocalStreamSettings(this.role ? this.role.default_settings : globalDefaultSettings());
             const url = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
             this.runSecretApi(url);
         });
@@ -500,7 +501,7 @@ export class Host {
     updateButtons() {
         const isOnline = this.isCustomOnline !== undefined ? this.isCustomOnline : (this.cache && this.cache.server_state != null);
         const customization = getDeviceCustomization(this.hostId);
-        const settings = getLocalStreamSettings(globalDefaultSettings());
+        const settings = getLocalStreamSettings(this.role ? this.role.default_settings : globalDefaultSettings());
         
         // Update Power button
         if (isOnline) {

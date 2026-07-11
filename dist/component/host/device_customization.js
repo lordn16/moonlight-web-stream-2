@@ -47,3 +47,20 @@ export function setDeviceCustomization(hostId, customization) {
     writeAll(all);
 }
 
+export function mergeServerDeviceCustomizations(serverCustomizations) {
+    if (!serverCustomizations || typeof serverCustomizations !== "object") {
+        return;
+    }
+    const all = readAll();
+    let changed = false;
+    for (const hostId in serverCustomizations) {
+        if (JSON.stringify(all[hostId]) !== JSON.stringify(serverCustomizations[hostId])) {
+            all[hostId] = serverCustomizations[hostId];
+            changed = true;
+        }
+    }
+    if (changed) {
+        writeAll(all);
+    }
+}
+
