@@ -104,14 +104,8 @@ export class Host {
             e.stopPropagation();
             const customization = getDeviceCustomization(this.hostId);
             const settings = getLocalStreamSettings(this.role ? this.role.default_settings : globalDefaultSettings());
-            const isOnline = this.isCustomOnline !== undefined ? this.isCustomOnline : (this.cache && this.cache.server_state != null);
-            if (isOnline) {
-                const url = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
-                this.runSecretApi(url);
-            } else {
-                const url = customization.bootApiUrl || settings.deviceStartApiUrl;
-                this.runSecretApi(url);
-            }
+            const url = customization.bootApiUrl || settings.deviceStartApiUrl;
+            this.runSecretApi(url);
         });
 
         this.btnForcePower = document.createElement("button");
