@@ -385,7 +385,9 @@ input[type=number] {
 
 /** Modal */
 .modal-background {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: fixed;
     z-index: 5000;
     left: 0;
@@ -403,25 +405,27 @@ input[type=number] {
 .modal-content {
     position: relative;
     z-index: 5001;
-    background: linear-gradient(135deg, rgba(0, 30, 50, 0.95) 0%, rgba(0, 15, 30, 0.95) 100%);
-    backdrop-filter: blur(15px);
-    margin: 10% auto;
-    padding: 20px;
-    border: 2px solid #00a3cc;
+    background: linear-gradient(135deg, rgba(0, 25, 45, 0.7) 0%, rgba(0, 10, 20, 0.8) 100%);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 2px solid rgba(0, 163, 204, 0.65);
     border-radius: 16px;
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 212, 255, 0.25), 0 0 60px rgba(0, 212, 255, 0.1);
     color: #a8e6ff;
-    width: 80%;
-    max-height: 60%;
+    width: 90%;
+    max-width: 580px;
+    max-height: 85%;
     overflow-y: auto;
+    padding: 16px 24px;
+    box-sizing: border-box;
 }
 
 /* Modal form styles for input alignment and widening */
 .modal-content form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 10px 0;
+    gap: 8px;
+    padding: 5px 0;
 }
 
 .modal-content .input-div {
@@ -432,11 +436,11 @@ input[type=number] {
 }
 
 .modal-content .input-div label {
-    width: 170px;
-    min-width: 170px;
+    width: 145px;
+    min-width: 145px;
     text-align: right;
-    margin-right: 15px;
-    font-size: 1rem;
+    margin-right: 12px;
+    font-size: 0.85rem;
     font-weight: 500;
     color: rgba(168, 230, 255, 0.85);
 }
@@ -446,9 +450,9 @@ input[type=number] {
 .modal-content .input-div input[type="number"] {
     flex: 1;
     width: 100%;
-    max-width: 450px;
-    padding: 10px 14px;
-    font-size: 1rem;
+    max-width: 380px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
     color: #ffffff;
     background-color: rgba(0, 20, 35, 0.6) !important;
     border: 1.5px solid rgba(0, 163, 204, 0.4) !important;
@@ -473,6 +477,74 @@ input[type=number] {
     border-color: #00f5ff !important;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.4) !important;
 }
+
+/* Centered Sign In form styles */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px 0;
+    gap: 12px;
+}
+
+.login-form h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+}
+
+.login-form .input-div {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+}
+
+.login-form .input-div label {
+    width: auto !important;
+    min-width: 0 !important;
+    text-align: center !important;
+    margin-right: 0 !important;
+    margin-bottom: 2px !important;
+    font-size: 0.85rem !important;
+    color: rgba(168, 230, 255, 0.8) !important;
+}
+
+.login-form .input-div input[type="text"],
+.login-form .input-div input[type="password"] {
+    width: 100% !important;
+    max-width: 280px !important;
+    text-align: center !important;
+    padding: 8px 12px !important;
+    font-size: 0.95rem !important;
+}
+
+.login-form .input-div:has(.file-label) {
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-top: 4px !important;
+}
+
+.login-form .file-label {
+    margin-right: 0 !important;
+    font-size: 0.85rem !important;
+}
+
+.login-form button[type="submit"],
+.login-form button:not([type="submit"]) {
+    width: 100% !important;
+    max-width: 280px !important;
+    padding: 10px !important;
+    font-size: 0.95rem !important;
+    border-radius: 8px !important;
+    margin-top: 5px !important;
+}
+
 
 
 .modal-disabled {
@@ -718,6 +790,37 @@ input[type=number] {
     padding: 0 0 0 var(--space-md);
     animation: fadeIn var(--dur-slow) ease;
 }
+
+.top-line h1 {
+    margin: 0;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    line-height: 1;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+}
+
+.top-line h1 .eu-title-suffix {
+    color: #ff3333; /* Vibrant red */
+}
+
+.top-line h1 .app-title-separator {
+    color: rgba(255, 255, 255, 0.45);
+    margin: 0 8px;
+    font-weight: 300;
+}
+
+.top-line h1 .app-title-admin-tag {
+    color: #ff3333;
+    margin-left: 6px;
+    font-size: 0.8em;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+}
+
 
 .top-line-actions {
     display: flex;

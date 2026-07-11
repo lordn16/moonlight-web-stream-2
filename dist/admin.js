@@ -103,8 +103,7 @@ class AdminApp {
         this.api = api;
         // Top Line
         this.topLine.classList.add("top-line");
-        this.moonlightTextElement.innerHTML =
-            'Moonlight Web <span style="color:red; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; -webkit-text-stroke: 2px #000">Admin</span>';
+        this.moonlightTextElement.innerHTML = 'pc.lordn<span class="eu-title-suffix">.eu</span> <span class="app-title-separator">|</span> Moonlight <span class="app-title-admin-tag">Admin</span>';
         this.topLine.appendChild(this.moonlightTextElement);
         this.topLine.appendChild(this.topLineActions);
         this.topLineActions.classList.add("top-line-actions");

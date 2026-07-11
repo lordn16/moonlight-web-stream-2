@@ -24,14 +24,13 @@ export class Host {
         this.statusInterval = null;
         this.uptimeInterval = null;
         this.lastF7State = null;
+        this.isCustomOnline = undefined;
         this.divElement = document.createElement("div");
         this.imageElement = document.createElement("img");
         this.imageOverlayElement = document.createElement("img");
         this.nameElement = document.createElement("p");
         this.infoElement = document.createElement("p");
         this.btnContainer = document.createElement("div");
-        this.btnStart = document.createElement("button");
-        this.btnShutdown = document.createElement("button");
         this.api = api;
         this.hostId = hostId;
         this.cache = host;
@@ -97,40 +96,36 @@ export class Host {
 
         // Configure buttons container
         this.btnContainer.classList.add("host-actions-container");
-        this.btnStart.innerText = getTranslations(getCurrentLanguage()).host.start;
-        this.btnStart.classList.add("host-action-btn", "start-btn");
-        this.btnStart.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const settings = getLocalStreamSettings(globalDefaultSettings());
-            this.runSecretApi(settings.deviceStartApiUrl);
-        });
-        this.btnShutdown.innerText = getTranslations(getCurrentLanguage()).host.forceShutdown;
-        this.btnShutdown.classList.add("host-action-btn", "shutdown-btn");
-        this.btnShutdown.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const settings = getLocalStreamSettings(globalDefaultSettings());
-            this.runSecretApi(settings.deviceForceShutdownApiUrl);
-        });
-        this.btnBoot = document.createElement("button");
-        this.btnBoot.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg> Boot`;
-        this.btnBoot.classList.add("host-action-btn", "boot-btn");
-        this.btnBoot.addEventListener("click", (e) => {
+        
+        this.btnPower = document.createElement("button");
+        this.btnPower.classList.add("host-action-btn");
+        this.btnPower.addEventListener("click", (e) => {
             e.stopPropagation();
             const customization = getDeviceCustomization(this.hostId);
-            this.runSecretApi(customization.bootApiUrl);
+            const settings = getLocalStreamSettings(globalDefaultSettings());
+            const isOnline = this.isCustomOnline !== undefined ? this.isCustomOnline : (this.cache && this.cache.server_state != null);
+            if (isOnline) {
+                const url = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
+                this.runSecretApi(url);
+            } else {
+                const url = customization.bootApiUrl || settings.deviceStartApiUrl;
+                this.runSecretApi(url);
+            }
         });
-        this.btnForceOff = document.createElement("button");
-        this.btnForceOff.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Force Off`;
-        this.btnForceOff.classList.add("host-action-btn", "shutdown-btn");
-        this.btnForceOff.addEventListener("click", (e) => {
+
+        this.btnForcePower = document.createElement("button");
+        this.btnForcePower.classList.add("host-action-btn", "shutdown-btn");
+        this.btnForcePower.addEventListener("click", (e) => {
             e.stopPropagation();
             const customization = getDeviceCustomization(this.hostId);
-            this.runSecretApi(customization.shutdownApiUrl);
+            const settings = getLocalStreamSettings(globalDefaultSettings());
+            const url = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
+            this.runSecretApi(url);
         });
-        this.btnContainer.appendChild(this.btnStart);
-        this.btnContainer.appendChild(this.btnShutdown);
-        this.btnContainer.appendChild(this.btnBoot);
-        this.btnContainer.appendChild(this.btnForceOff);
+        
+        this.btnContainer.appendChild(this.btnPower);
+        this.btnContainer.appendChild(this.btnForcePower);
+        
         // Append elements
         this.divElement.appendChild(this.imageElement);
         this.divElement.appendChild(this.imageOverlayElement);
@@ -444,6 +439,7 @@ export class Host {
             }
             this.statusContainer.style.display = "none";
             this.stopUptimeTimer();
+            this.isCustomOnline = undefined;
         }
         // Show/hide F7 Toggle based on f7ApiUrl presence
         if (customization.f7ApiUrl) {
@@ -451,45 +447,10 @@ export class Host {
         } else {
             this.f7Container.style.display = "none";
         }
-        const settings = getLocalStreamSettings(globalDefaultSettings());
-        let hasStart = false;
-        let hasShutdown = false;
-        let hasBoot = false;
-        let hasForceOff = false;
-        if (settings.deviceStartApiUrl) {
-            this.btnStart.style.display = "inline-block";
-            hasStart = true;
-        }
-        else {
-            this.btnStart.style.display = "none";
-        }
-        if (settings.deviceForceShutdownApiUrl) {
-            this.btnShutdown.style.display = "inline-block";
-            hasShutdown = true;
-        }
-        else {
-            this.btnShutdown.style.display = "none";
-        }
-        if (customization.bootApiUrl) {
-            this.btnBoot.style.display = "inline-flex";
-            hasBoot = true;
-        }
-        else {
-            this.btnBoot.style.display = "none";
-        }
-        if (customization.shutdownApiUrl) {
-            this.btnForceOff.style.display = "inline-flex";
-            hasForceOff = true;
-        }
-        else {
-            this.btnForceOff.style.display = "none";
-        }
-        if (hasStart || hasShutdown || hasBoot || hasForceOff) {
-            this.btnContainer.style.display = "flex";
-        }
-        else {
-            this.btnContainer.style.display = "none";
-        }
+        
+        // Refresh buttons state
+        this.updateButtons();
+        
         if (this.cache.server_state == null) {
             this.imageOverlayElement.src = HOST_OVERLAY_OFFLINE;
         }
@@ -536,12 +497,43 @@ export class Host {
             this.uptimeInterval = null;
         }
     }
+    updateButtons() {
+        const isOnline = this.isCustomOnline !== undefined ? this.isCustomOnline : (this.cache && this.cache.server_state != null);
+        const customization = getDeviceCustomization(this.hostId);
+        const settings = getLocalStreamSettings(globalDefaultSettings());
+        
+        // Update Power button
+        if (isOnline) {
+            this.btnPower.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg> Power Off`;
+            this.btnPower.className = "host-action-btn shutdown-btn";
+        } else {
+            this.btnPower.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg> Power On`;
+            this.btnPower.className = "host-action-btn boot-btn";
+        }
+        
+        // Force Power button
+        this.btnForcePower.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Force Power`;
+        
+        const hasPowerUrl = customization.bootApiUrl || customization.shutdownApiUrl || settings.deviceStartApiUrl || settings.deviceForceShutdownApiUrl;
+        const hasForceUrl = customization.shutdownApiUrl || settings.deviceForceShutdownApiUrl;
+        
+        this.btnPower.style.display = hasPowerUrl ? "inline-flex" : "none";
+        this.btnForcePower.style.display = hasForceUrl ? "inline-flex" : "none";
+        
+        if (hasPowerUrl || hasForceUrl) {
+            this.btnContainer.style.display = "flex";
+        } else {
+            this.btnContainer.style.display = "none";
+        }
+    }
     checkStatus() {
         return __awaiter(this, void 0, void 0, function* () {
             const customization = getDeviceCustomization(this.hostId);
             if (!customization.statusApiUrl) {
                 this.statusContainer.style.display = "none";
                 this.stopUptimeTimer();
+                this.isCustomOnline = undefined;
+                this.updateButtons();
                 return;
             }
             this.statusContainer.style.display = "flex";
@@ -556,7 +548,6 @@ export class Host {
                 } catch (e) {
                     data = text;
                 }
-
                 const parseBool = (val) => {
                     if (val === undefined || val === null) return false;
                     if (typeof val === "boolean") return val;
@@ -567,11 +558,9 @@ export class Host {
                     }
                     return !!val;
                 };
-
                 let isOnline = false;
                 let f7Enabled = false;
                 let uptimeClock = null;
-
                 if (data && typeof data === "object") {
                     const getVal = (obj, keys) => {
                         for (const k of keys) {
@@ -585,21 +574,19 @@ export class Host {
                         }
                         return undefined;
                     };
-
                     isOnline = parseBool(getVal(data, ["pc_online", "pcOnline", "online"]));
-                    
                     const f7Val = getVal(data, ["f7_enabled", "f7Enabled"]);
                     if (f7Val !== undefined) {
                         f7Enabled = parseBool(f7Val);
                         this.lastF7State = f7Enabled;
                         this.f7Toggle.checked = f7Enabled;
                     }
-                    
                     uptimeClock = getVal(data, ["pc_uptime_clock", "pcUptimeClock", "uptime_clock", "uptime"]);
                 } else if (typeof data === "string") {
                     isOnline = parseBool(data);
                 }
-
+                
+                this.isCustomOnline = isOnline;
                 this.statusIndicatorIcon.className = "host-status-custom-icon " + (isOnline ? "online" : "offline");
                 
                 if (isOnline && uptimeClock) {
@@ -608,11 +595,14 @@ export class Host {
                     this.stopUptimeTimer();
                     this.statusUptimeClock.innerText = isOnline ? "Online" : "Offline";
                 }
+                this.updateButtons();
             } catch (err) {
                 console.error(`Moonlight Status check failed for host ${this.hostId}. If this is a network/fetch error, please check if CORS is enabled on your API server. Error:`, err);
+                this.isCustomOnline = false;
                 this.statusIndicatorIcon.className = "host-status-custom-icon offline";
                 this.stopUptimeTimer();
                 this.statusUptimeClock.innerText = "Offline";
+                this.updateButtons();
             }
         });
     }

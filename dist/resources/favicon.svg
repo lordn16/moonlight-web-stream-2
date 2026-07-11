@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Rounded black square background -->
+  <rect width="256" height="256" rx="64" fill="#000000" />
+  <!-- Centered '.eu' text in red, matching the layout of the uploaded icon -->
+  <text x="50%" y="58%" font-family="'Syne', 'Inter', -apple-system, sans-serif" font-weight="800" font-size="115" fill="#ff3333" text-anchor="middle" dominant-baseline="middle">.eu</text>
+</svg>

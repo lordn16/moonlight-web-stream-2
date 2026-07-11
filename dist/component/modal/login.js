@@ -13,6 +13,7 @@ import { FormModal } from "./form.js";
 export class ApiUserPasswordPrompt extends FormModal {
     constructor() {
         super();
+        this.formElement.classList.add("login-form");
         this.text = document.createElement("h3");
         const i = getTranslations(getCurrentLanguage()).modal;
         this.text.innerText = i.login;
