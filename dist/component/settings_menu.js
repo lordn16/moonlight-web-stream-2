@@ -475,6 +475,7 @@ export class StreamSettingsComponent {
         parent.insertBefore(this.divElement, before);
     }
     mount(parent) {
+        this.divElement.classList.remove("settings-leaving");
         parent.appendChild(this.divElement);
     }
     unmount(parent) {
