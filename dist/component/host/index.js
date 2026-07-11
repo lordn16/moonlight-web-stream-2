@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { apiDeleteHost, apiGetHost, isDetailedHost, apiPostPair, apiWakeUp, apiGetUser, apiPatchHost } from "../../api.js";
+import { apiDeleteHost, apiGetHost, isDetailedHost, apiPostPair, apiWakeUp, apiGetUser, apiPatchHost, apiPatchRole } from "../../api.js";
 import { ComponentEvent } from "../index.js";
 import { getCurrentLanguage, getTranslations } from "../../i18n.js";
 import { setContextMenu } from "../context_menu.js";
@@ -267,6 +267,30 @@ export class Host {
             const result = yield showModal(modal);
             if (result !== null) {
                 setDeviceCustomization(this.hostId, result);
+                
+                // Automatically sync to server's role defaults if admin
+                try {
+                    const user = this.userCache || (yield apiGetUser(this.api));
+                    if (user && user.role === "Admin" && this.role) {
+                        const settings = getLocalStreamSettings(this.role.default_settings);
+                        const raw = localStorage.getItem("mlDeviceCustomizations");
+                        if (raw) {
+                            settings.deviceCustomizations = JSON.parse(raw);
+                        }
+                        yield apiPatchRole(this.api, {
+                            id: this.role.id,
+                            name: null,
+                            ty: this.role.ty,
+                            default_settings: settings,
+                            permissions: null,
+                        });
+                        this.role.default_settings = settings;
+                    }
+                }
+                catch (err) {
+                    console.warn("Failed to auto-save customizations to server:", err);
+                }
+
                 this.forceFetch();
             }
         });
