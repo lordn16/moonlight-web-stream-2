@@ -309,9 +309,13 @@ export class Host {
                     parsed = text;
                 }
                 showNotification(`API Response: ${typeof parsed === "object" ? JSON.stringify(parsed) : parsed}`, "info");
+                this.checkStatus();
+                setTimeout(() => this.checkStatus(), 2000);
             }
             catch (err) {
                 showNotification(`API Error: ${err.message || err}`, "error");
+                this.checkStatus();
+                setTimeout(() => this.checkStatus(), 2000);
             }
         });
     }
@@ -471,7 +475,7 @@ export class Host {
         this.updateButtons();
         
         if (this.cache.server_state == null) {
-            this.imageOverlayElement.src = HOST_OVERLAY_OFFLINE;
+            this.imageOverlayElement.src = HOST_OVERLAY_NONE;
         }
         else if (this.cache.paired != "Paired") {
             this.imageOverlayElement.src = HOST_OVERLAY_LOCK;
@@ -556,6 +560,10 @@ export class Host {
                 return;
             }
             this.statusContainer.style.display = "flex";
+            if (this.isCustomOnline === undefined) {
+                this.statusIndicatorIcon.className = "host-status-custom-icon offline";
+                this.statusUptimeClock.innerText = "Offline";
+            }
             try {
                 const res = yield fetch(customization.statusApiUrl);
                 const text = yield res.text();
