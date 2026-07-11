@@ -416,6 +416,65 @@ input[type=number] {
     overflow-y: auto;
 }
 
+/* Modal form styles for input alignment and widening */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 10px 0;
+}
+
+.modal-content .input-div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.modal-content .input-div label {
+    width: 170px;
+    min-width: 170px;
+    text-align: right;
+    margin-right: 15px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgba(168, 230, 255, 0.85);
+}
+
+.modal-content .input-div input[type="text"],
+.modal-content .input-div input[type="password"],
+.modal-content .input-div input[type="number"] {
+    flex: 1;
+    width: 100%;
+    max-width: 450px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: rgba(0, 20, 35, 0.6) !important;
+    border: 1.5px solid rgba(0, 163, 204, 0.4) !important;
+    border-radius: 8px !important;
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 212, 255, 0.05) !important;
+    transition: all 0.25s ease !important;
+}
+
+.modal-content .input-div input[type="text"]:hover:enabled,
+.modal-content .input-div input[type="password"]:hover:enabled,
+.modal-content .input-div input[type="number"]:hover:enabled {
+    background-color: rgba(0, 30, 55, 0.7) !important;
+    border-color: rgba(0, 212, 255, 0.8) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 212, 255, 0.15) !important;
+}
+
+.modal-content .input-div input[type="text"]:focus,
+.modal-content .input-div input[type="password"]:focus,
+.modal-content .input-div input[type="number"]:focus {
+    background-color: rgba(0, 40, 70, 0.85) !important;
+    border-color: #00f5ff !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.4) !important;
+}
+
+
 .modal-disabled {
     /** animation */
     visibility: hidden;
