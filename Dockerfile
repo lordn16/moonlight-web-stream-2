@@ -1,14 +1,13 @@
 FROM mrcreativ3001/moonlight-web-stream:latest
 
-# 1. Kopiera CSS-filerna till styles-mappen (Detta fungerar perfekt)
+# CSS
 COPY ./dist/styles/standard.css /moonlight-web/static/styles/standard.css
 COPY ./dist/styles/moonlight.css /moonlight-web/static/styles/moonlight.css
 
-# 2. Kopiera appearance.js till roten av static ISTÄLLET för styles, 
-# ELLER se till att den kopieras exakt dit din HTML förväntar sig den.
-COPY ./dist/styles/appearance.js /moonlight-web/static/appearance.js
+# Dina modifierade filer (Nu med all din logik samlad i appearance.js)
+COPY ./dist/styles/appearance.js /moonlight-web/static/styles/appearance.js
 
-# 3. Kopiera komponenterna till sina rätta platser
+# Dina komponenter (Håll koll på att dessa inte har "browser.runtime" i sig)
 COPY ./dist/component/settings_menu.js /moonlight-web/static/component/settings_menu.js
 COPY ./dist/component/host/index.js /moonlight-web/static/component/host/index.js
 COPY ./dist/component/host/list.js /moonlight-web/static/component/host/list.js
