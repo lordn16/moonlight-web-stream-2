@@ -696,6 +696,28 @@ input[type=number] {
     font-weight: 300;
 }
 
+.title-home-link {
+    text-decoration: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    transition: opacity 0.2s ease;
+}
+
+.title-home-link:hover {
+    opacity: 0.75;
+}
+
+.title-home-link .eu-title-suffix {
+    color: #ff3333;
+}
+
+.title-home-link .app-title-separator {
+    color: rgba(255, 255, 255, 0.45);
+    margin: 0 8px;
+    font-weight: 300;
+}
+
 .top-line h1 .app-title-admin-tag {
     color: #ff3333;
     margin-left: 6px;
@@ -836,6 +858,34 @@ input[type=number] {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    animation: settingsSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes settingsSlideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes settingsSlideDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+}
+
+.settings.settings-leaving {
+    animation: settingsSlideDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+    pointer-events: none;
 }
 
 .settings > * {
@@ -1370,10 +1420,10 @@ body.has-bg-image::before {
 }
 
 .settings-close-btn {
-    position: sticky;
-    top: calc(var(--ml-topbar-height, 60px) + 16px);
-    right: 24px;
-    float: right;
+    position: fixed !important;
+    top: calc(var(--ml-topbar-height, 60px) + 16px) !important;
+    right: calc(var(--ml-topbar-padding-x, 24px)) !important;
+    z-index: 1001 !important;
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
@@ -1387,8 +1437,8 @@ body.has-bg-image::before {
     justify-content: center !important;
     cursor: pointer;
     transition: all 0.2s ease !important;
-    z-index: 1002;
     padding: 0 !important;
+    float: none !important;
 }
 
 .settings-close-btn:hover {

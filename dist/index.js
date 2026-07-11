@@ -91,7 +91,7 @@ class MainApp {
         this.role = bootstrapRole;
         // Top Line
         this.topLine.classList.add("top-line");
-        this.moonlightTextElement.innerHTML = 'pc.lordn<span class="eu-title-suffix">.eu</span> <span class="app-title-separator">|</span> Moonlight';
+        this.moonlightTextElement.innerHTML = '<a href="https://pc.lordn.eu" class="title-home-link">pc.lordn<span class="eu-title-suffix">.eu</span> <span class="app-title-separator">|</span> Moonlight</a>';
         this.topLine.appendChild(this.moonlightTextElement);
         this.topLine.appendChild(this.topLineActions);
         this.topLineActions.classList.add("top-line-actions");
