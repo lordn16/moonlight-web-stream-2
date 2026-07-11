@@ -1108,3 +1108,151 @@ body.has-bg-image::before {
     margin-top: 4px;
     text-align: center;
 }
+
+/* Button Alignments with Icons */
+.host-action-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+}
+.host-action-btn .btn-icon {
+    flex-shrink: 0;
+}
+
+/* Custom Status Container and Indicator */
+.host-status-custom-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.host-status-custom-icon {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.host-status-custom-icon.online {
+    background-color: #10b981;
+    box-shadow: 0 0 10px #10b981, 0 0 20px rgba(16, 185, 129, 0.5);
+}
+
+.host-status-custom-icon.offline {
+    background-color: #ef4444;
+    box-shadow: 0 0 10px #ef4444, 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.host-status-custom-clock {
+    font-size: 0.9rem;
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+}
+
+/* F7 Toggle Switch */
+.host-f7-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    box-sizing: border-box;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.host-f7-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+}
+
+.host-f7-container .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+    margin: 0;
+}
+
+.host-f7-container .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.host-f7-container .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    transition: .3s;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.host-f7-container .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.host-f7-container input:checked + .slider {
+    background-color: rgba(16, 185, 129, 0.5);
+    border-color: rgba(16, 185, 129, 0.7);
+}
+
+.host-f7-container input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+.settings-close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    transition: all 0.2s ease !important;
+    z-index: 1002;
+    padding: 0 !important;
+}
+
+.settings-close-btn:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    transform: scale(1.05) !important;
+}
+
+.settings-close-btn:active {
+    transform: scale(0.95) !important;
+}

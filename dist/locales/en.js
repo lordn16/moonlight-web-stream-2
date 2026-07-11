@@ -159,6 +159,12 @@ export const en = {
         bootApiUrl: "Boot API URL",
         bootApiUrlHelp: "Paste URL that directly sends a boot/power signal to the device",
         boot: "Boot",
+        shutdownApiUrl: "Force Off API URL",
+        shutdownApiUrlHelp: "Paste URL to directly force turn off the device",
+        statusApiUrl: "Status API URL",
+        statusApiUrlHelp: "Paste URL to query status JSON (online/offline and uptime)",
+        f7ApiUrl: "F7 Toggle API URL",
+        f7ApiUrlHelp: "Paste URL to toggle F7 (supports {enabled} and {state})",
         start: "Start",
         forceShutdown: "Force Shutdown",
         details: (host) => `Web Id: ${host.host_id}\n` +

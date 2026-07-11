@@ -21,6 +21,9 @@ export class Host {
     constructor(api, hostId, host) {
         this.userCache = null;
         this.cache = null;
+        this.statusInterval = null;
+        this.uptimeInterval = null;
+        this.lastF7State = null;
         this.divElement = document.createElement("div");
         this.imageElement = document.createElement("img");
         this.imageOverlayElement = document.createElement("img");
@@ -41,6 +44,57 @@ export class Host {
         this.nameElement.classList.add("host-name");
         // Configure info
         this.infoElement.classList.add("host-info-text");
+        
+        // Custom status container
+        this.statusContainer = document.createElement("div");
+        this.statusContainer.classList.add("host-status-custom-container");
+        this.statusContainer.style.display = "none";
+        
+        this.statusIndicatorIcon = document.createElement("span");
+        this.statusIndicatorIcon.classList.add("host-status-custom-icon");
+        
+        this.statusUptimeClock = document.createElement("span");
+        this.statusUptimeClock.classList.add("host-status-custom-clock");
+        
+        this.statusContainer.appendChild(this.statusIndicatorIcon);
+        this.statusContainer.appendChild(this.statusUptimeClock);
+        
+        // F7 toggle container
+        this.f7Container = document.createElement("div");
+        this.f7Container.classList.add("host-f7-container");
+        this.f7Container.style.display = "none";
+        
+        this.f7Label = document.createElement("span");
+        this.f7Label.innerText = "F7 Script";
+        this.f7Label.classList.add("host-f7-label");
+        
+        this.f7SwitchLabel = document.createElement("label");
+        this.f7SwitchLabel.classList.add("switch");
+        
+        this.f7Toggle = document.createElement("input");
+        this.f7Toggle.type = "checkbox";
+        
+        this.f7Slider = document.createElement("span");
+        this.f7Slider.classList.add("slider", "round");
+        
+        this.f7SwitchLabel.appendChild(this.f7Toggle);
+        this.f7SwitchLabel.appendChild(this.f7Slider);
+        
+        this.f7Container.appendChild(this.f7Label);
+        this.f7Container.appendChild(this.f7SwitchLabel);
+        
+        this.f7Toggle.addEventListener("change", () => {
+            const customization = getDeviceCustomization(this.hostId);
+            if (!customization.f7ApiUrl) return;
+            const enabled = this.f7Toggle.checked;
+            if (this.lastF7State === enabled) return;
+            this.lastF7State = enabled;
+            const url = customization.f7ApiUrl
+                .replace(/{enabled}/g, String(enabled))
+                .replace(/{state}/g, enabled ? "on" : "off");
+            this.runSecretApi(url);
+        });
+
         // Configure buttons container
         this.btnContainer.classList.add("host-actions-container");
         this.btnStart.innerText = getTranslations(getCurrentLanguage()).host.start;
@@ -58,21 +112,32 @@ export class Host {
             this.runSecretApi(settings.deviceForceShutdownApiUrl);
         });
         this.btnBoot = document.createElement("button");
-        this.btnBoot.innerText = getTranslations(getCurrentLanguage()).host.boot || "Boot";
+        this.btnBoot.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg> Boot`;
         this.btnBoot.classList.add("host-action-btn", "boot-btn");
         this.btnBoot.addEventListener("click", (e) => {
             e.stopPropagation();
             const customization = getDeviceCustomization(this.hostId);
             this.runSecretApi(customization.bootApiUrl);
         });
+        this.btnForceOff = document.createElement("button");
+        this.btnForceOff.innerHTML = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Force Off`;
+        this.btnForceOff.classList.add("host-action-btn", "shutdown-btn");
+        this.btnForceOff.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const customization = getDeviceCustomization(this.hostId);
+            this.runSecretApi(customization.shutdownApiUrl);
+        });
         this.btnContainer.appendChild(this.btnStart);
         this.btnContainer.appendChild(this.btnShutdown);
         this.btnContainer.appendChild(this.btnBoot);
+        this.btnContainer.appendChild(this.btnForceOff);
         // Append elements
         this.divElement.appendChild(this.imageElement);
         this.divElement.appendChild(this.imageOverlayElement);
         this.divElement.appendChild(this.nameElement);
         this.divElement.appendChild(this.infoElement);
+        this.divElement.appendChild(this.statusContainer);
+        this.divElement.appendChild(this.f7Container);
         this.divElement.appendChild(this.btnContainer);
         this.divElement.addEventListener("click", this.onClick.bind(this));
         this.divElement.addEventListener("contextmenu", this.onContextMenu.bind(this));
@@ -276,6 +341,7 @@ export class Host {
     }
     remove() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.cleanupCustomStatus();
             yield apiDeleteHost(this.api, {
                 host_id: this.getHostId()
             });
@@ -338,8 +404,6 @@ export class Host {
             this.cache = host;
         }
         else {
-            // if server_state == null it means this host is offline
-            // -> updating cache means setting it to offline
             if (this.cache.server_state != null) {
                 Object.assign(this.cache, host);
             }
@@ -367,10 +431,31 @@ export class Host {
             this.infoElement.innerText = "";
             this.infoElement.style.display = "none";
         }
+        // Update custom status checking interval
+        if (customization.statusApiUrl) {
+            if (!this.statusInterval) {
+                this.checkStatus();
+                this.statusInterval = setInterval(() => this.checkStatus(), 30000);
+            }
+        } else {
+            if (this.statusInterval) {
+                clearInterval(this.statusInterval);
+                this.statusInterval = null;
+            }
+            this.statusContainer.style.display = "none";
+            this.stopUptimeTimer();
+        }
+        // Show/hide F7 Toggle based on f7ApiUrl presence
+        if (customization.f7ApiUrl) {
+            this.f7Container.style.display = "flex";
+        } else {
+            this.f7Container.style.display = "none";
+        }
         const settings = getLocalStreamSettings(globalDefaultSettings());
         let hasStart = false;
         let hasShutdown = false;
         let hasBoot = false;
+        let hasForceOff = false;
         if (settings.deviceStartApiUrl) {
             this.btnStart.style.display = "inline-block";
             hasStart = true;
@@ -386,13 +471,20 @@ export class Host {
             this.btnShutdown.style.display = "none";
         }
         if (customization.bootApiUrl) {
-            this.btnBoot.style.display = "inline-block";
+            this.btnBoot.style.display = "inline-flex";
             hasBoot = true;
         }
         else {
             this.btnBoot.style.display = "none";
         }
-        if (hasStart || hasShutdown || hasBoot) {
+        if (customization.shutdownApiUrl) {
+            this.btnForceOff.style.display = "inline-flex";
+            hasForceOff = true;
+        }
+        else {
+            this.btnForceOff.style.display = "none";
+        }
+        if (hasStart || hasShutdown || hasBoot || hasForceOff) {
             this.btnContainer.style.display = "flex";
         }
         else {
@@ -408,10 +500,85 @@ export class Host {
             this.imageOverlayElement.src = HOST_OVERLAY_NONE;
         }
     }
+    cleanupCustomStatus() {
+        if (this.statusInterval) {
+            clearInterval(this.statusInterval);
+            this.statusInterval = null;
+        }
+        this.stopUptimeTimer();
+    }
+    formatDuration(totalSeconds) {
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+    }
+    parseDuration(clockStr) {
+        if (!clockStr) return 0;
+        const parts = clockStr.split(":").map(Number);
+        if (parts.length === 3) {
+            return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        }
+        return 0;
+    }
+    startUptimeTimer(initialClockStr) {
+        this.stopUptimeTimer();
+        let seconds = this.parseDuration(initialClockStr);
+        this.statusUptimeClock.innerText = this.formatDuration(seconds);
+        this.uptimeInterval = setInterval(() => {
+            seconds++;
+            this.statusUptimeClock.innerText = this.formatDuration(seconds);
+        }, 1000);
+    }
+    stopUptimeTimer() {
+        if (this.uptimeInterval) {
+            clearInterval(this.uptimeInterval);
+            this.uptimeInterval = null;
+        }
+    }
+    checkStatus() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const customization = getDeviceCustomization(this.hostId);
+            if (!customization.statusApiUrl) {
+                this.statusContainer.style.display = "none";
+                this.stopUptimeTimer();
+                return;
+            }
+            this.statusContainer.style.display = "flex";
+            try {
+                const res = yield fetch(customization.statusApiUrl);
+                const data = yield res.json();
+                const isOnline = !!data.pc_online;
+                this.statusIndicatorIcon.className = "host-status-custom-icon " + (isOnline ? "online" : "offline");
+                if (data.f7_enabled !== undefined) {
+                    this.lastF7State = !!data.f7_enabled;
+                    this.f7Toggle.checked = !!data.f7_enabled;
+                }
+                if (isOnline && data.pc_uptime_clock) {
+                    this.startUptimeTimer(data.pc_uptime_clock);
+                } else {
+                    this.stopUptimeTimer();
+                    this.statusUptimeClock.innerText = "Offline";
+                }
+            } catch (err) {
+                console.error("Status check failed:", err);
+                this.statusIndicatorIcon.className = "host-status-custom-icon offline";
+                this.stopUptimeTimer();
+                this.statusUptimeClock.innerText = "Offline";
+            }
+        });
+    }
     mount(parent) {
         parent.appendChild(this.divElement);
+        // Start status checks on mount
+        const customization = getDeviceCustomization(this.hostId);
+        if (customization.statusApiUrl && !this.statusInterval) {
+            this.checkStatus();
+            this.statusInterval = setInterval(() => this.checkStatus(), 30000);
+        }
     }
     unmount(parent) {
+        this.cleanupCustomStatus();
         parent.removeChild(this.divElement);
     }
 }

@@ -134,6 +134,7 @@ class MainApp {
         // Settings
         this.settings = new StreamSettingsComponent(bootstrapRole.permissions, getLocalStreamSettings(bootstrapRole.default_settings));
         this.settings.addChangeListener(this.onSettingsChange.bind(this));
+        this.divElement.addEventListener("close-settings", () => this.setCurrentDisplay("hosts"));
         // Append default elements
         this.divElement.appendChild(this.topLine);
         this.divElement.appendChild(this.actionElement);
@@ -268,7 +269,9 @@ class MainApp {
             (_b = this.gameList) === null || _b === void 0 ? void 0 : _b.unmount(this.divElement);
         }
         else if (this.currentDisplay == "settings") {
-            this.actionElement.removeChild(this.backButton);
+            if (this.actionElement.contains(this.backButton)) {
+                this.actionElement.removeChild(this.backButton);
+            }
             if (this.actionElement.contains(this.saveRoleDefaultsButton)) {
                 this.actionElement.removeChild(this.saveRoleDefaultsButton);
             }
@@ -293,7 +296,6 @@ class MainApp {
             setAppState({ display: "games", hostId: (_e = this.gameList) === null || _e === void 0 ? void 0 : _e.getHostId() }, pushIntoHistory);
         }
         else if (display == "settings") {
-            this.actionElement.appendChild(this.backButton);
             if (((_f = this.user) === null || _f === void 0 ? void 0 : _f.role) == "Admin") {
                 this.actionElement.appendChild(this.saveRoleDefaultsButton);
             }
