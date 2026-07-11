@@ -4,12 +4,14 @@ FROM mrcreativ3001/moonlight-web-stream:latest
 COPY ./dist/styles/standard.css /moonlight-web/static/styles/standard.css
 COPY ./dist/styles/moonlight.css /moonlight-web/static/styles/moonlight.css
 
-# 2. HTML (Som länkar in både original-JS och era nya filer)
+# 2. HTML (Som länkar in original-JS från imagen)
 COPY ./dist/index.html /moonlight-web/static/index.html
 
-COPY ./dist/styles/appearance.js /moonlight-web/static/appearance.js
+# 3. Styles JS (setStyle + applyAppearanceSettings – måste ligga i styles/)
+COPY ./dist/styles/index.js /moonlight-web/static/styles/index.js
+COPY ./dist/styles/appearance.js /moonlight-web/static/styles/appearance.js
 
-# 4. Era komponenter
+# 4. Komponenter (våra anpassade versioner)
 COPY ./dist/component/settings_menu.js /moonlight-web/static/component/settings_menu.js
 COPY ./dist/component/host/index.js /moonlight-web/static/component/host/index.js
 COPY ./dist/component/host/list.js /moonlight-web/static/component/host/list.js
