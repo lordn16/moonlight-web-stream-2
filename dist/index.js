@@ -100,6 +100,7 @@ class MainApp {
             window.location.reload();
         }));
         this.logoutButton.classList.add("logout-button");
+        this.logoutButton.title = "sign out";
         this.loginButton.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             const success = yield tryLogin();
             if (success) {
@@ -107,10 +108,12 @@ class MainApp {
             }
         }));
         this.loginButton.classList.add("login-button");
+        this.loginButton.title = "sign in";
         this.adminButton.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             window.location.href = buildUrl("/admin.html");
         }));
         this.adminButton.classList.add("admin-button");
+        this.adminButton.title = "admin";
         // Actions
         this.actionElement.classList.add("actions-list");
         // Back button
@@ -120,12 +123,14 @@ class MainApp {
         this.backButton.dataset.variant = "back-button";
         // Host add button
         this.hostAddButton.classList.add("host-add");
+        this.hostAddButton.title = "add device";
         this.hostAddButton.addEventListener("click", this.addHost.bind(this));
         // Host list
         this.hostList = new HostList(api);
         this.hostList.addHostOpenListener(this.onHostOpen.bind(this));
         // Settings Button
         this.settingsButton.classList.add("open-settings");
+        this.settingsButton.title = "settings";
         this.settingsButton.addEventListener("click", () => this.setCurrentDisplay("settings"));
         this.saveRoleDefaultsButton.innerText = I.settings.saveRoleDefaults;
         this.saveRoleDefaultsButton.classList.add("button-fit-content");
@@ -338,12 +343,6 @@ class MainApp {
             if (this.topLineActions.contains(this.adminButton)) {
                 this.topLineActions.removeChild(this.adminButton);
             }
-            if (this.user.is_default_user) {
-                this.topLineActions.appendChild(this.loginButton);
-            }
-            else {
-                this.topLineActions.appendChild(this.logoutButton);
-            }
             if (this.user.role == "Admin") {
                 this.topLineActions.appendChild(this.adminButton);
                 if (this.currentDisplay == "settings" && !this.actionElement.contains(this.saveRoleDefaultsButton)) {
@@ -352,6 +351,12 @@ class MainApp {
             }
             else if (this.actionElement.contains(this.saveRoleDefaultsButton)) {
                 this.actionElement.removeChild(this.saveRoleDefaultsButton);
+            }
+            if (this.user.is_default_user) {
+                this.topLineActions.appendChild(this.loginButton);
+            }
+            else {
+                this.topLineActions.appendChild(this.logoutButton);
             }
         });
     }

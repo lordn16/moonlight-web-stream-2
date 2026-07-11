@@ -28,7 +28,7 @@ button,
 
 /* Make room for the fixed top bar (non-stream pages) */
 body:not(.stream) {
-    padding-top: var(--ml-topbar-height);
+    padding-top: calc(var(--ml-topbar-height) + 24px) !important;
 }
 
 /* Prevent pull down refresh when Streaming */

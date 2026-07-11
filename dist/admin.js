@@ -113,11 +113,13 @@ class AdminApp {
             window.location.reload();
         }));
         this.logoutButton.classList.add("logout-button");
+        this.logoutButton.title = "sign out";
         this.topLineActions.appendChild(this.logoutButton);
         this.userButton.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             window.location.href = buildUrl("/");
         }));
         this.userButton.classList.add("user-button");
+        this.userButton.title = "home";
         this.topLineActions.appendChild(this.userButton);
         this.root.appendChild(this.topLine);
         // Tab div
