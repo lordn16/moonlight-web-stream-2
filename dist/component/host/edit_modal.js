@@ -34,9 +34,13 @@ export class EditDeviceModal extends FormModal {
             value: initialValues.f7ApiUrl || "",
             placeholer: i.f7ApiUrlHelp || "URL template (supports {enabled} and {state})"
         });
+        this.biosApiUrl = new InputComponent("biosApiUrl", "text", i.biosApiUrl || "BIOS Toggle API URL", {
+            value: initialValues.biosApiUrl || "",
+            placeholer: i.biosApiUrlHelp || "URL template (supports {enabled} and {state}) to open BIOS"
+        });
     }
     reset() {
-        var _a, _b, _c, _d, _e, _f, _g;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         this.displayName.setValue((_a = this.initialValues.displayName) !== null && _a !== void 0 ? _a : "");
         this.iconUrl.setValue((_b = this.initialValues.iconUrl) !== null && _b !== void 0 ? _b : "");
         this.info.setValue((_c = this.initialValues.info) !== null && _c !== void 0 ? _c : "");
@@ -44,6 +48,7 @@ export class EditDeviceModal extends FormModal {
         this.bootApiUrl.setValue((_e = this.initialValues.bootApiUrl) !== null && _e !== void 0 ? _e : "");
         this.shutdownApiUrl.setValue((_f = this.initialValues.shutdownApiUrl) !== null && _f !== void 0 ? _f : "");
         this.f7ApiUrl.setValue((_g = this.initialValues.f7ApiUrl) !== null && _g !== void 0 ? _g : "");
+        this.biosApiUrl.setValue((_h = this.initialValues.biosApiUrl) !== null && _h !== void 0 ? _h : "");
     }
     submit() {
         return {
@@ -53,7 +58,8 @@ export class EditDeviceModal extends FormModal {
             statusApiUrl: this.statusApiUrl.getValue(),
             bootApiUrl: this.bootApiUrl.getValue(),
             shutdownApiUrl: this.shutdownApiUrl.getValue(),
-            f7ApiUrl: this.f7ApiUrl.getValue()
+            f7ApiUrl: this.f7ApiUrl.getValue(),
+            biosApiUrl: this.biosApiUrl.getValue()
         };
     }
     mountForm(form) {
@@ -65,6 +71,7 @@ export class EditDeviceModal extends FormModal {
         this.bootApiUrl.mount(form);
         this.shutdownApiUrl.mount(form);
         this.f7ApiUrl.mount(form);
+        this.biosApiUrl.mount(form);
     }
 }
 

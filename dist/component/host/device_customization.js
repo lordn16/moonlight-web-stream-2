@@ -21,7 +21,7 @@ export function getDeviceCustomization(hostId) {
     return (_a = readAll()[String(hostId)]) !== null && _a !== void 0 ? _a : {};
 }
 export function setDeviceCustomization(hostId, customization) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
     const all = readAll();
     const hasContent = ((_a = customization.iconUrl) === null || _a === void 0 ? void 0 : _a.trim())
         || ((_b = customization.displayName) === null || _b === void 0 ? void 0 : _b.trim())
@@ -29,7 +29,8 @@ export function setDeviceCustomization(hostId, customization) {
         || ((_d = customization.bootApiUrl) === null || _d === void 0 ? void 0 : _d.trim())
         || ((_e = customization.shutdownApiUrl) === null || _e === void 0 ? void 0 : _e.trim())
         || ((_f = customization.statusApiUrl) === null || _f === void 0 ? void 0 : _f.trim())
-        || ((_g = customization.f7ApiUrl) === null || _g === void 0 ? void 0 : _g.trim());
+        || ((_g = customization.f7ApiUrl) === null || _g === void 0 ? void 0 : _g.trim())
+        || (customization.biosApiUrl && customization.biosApiUrl.trim());
     if (hasContent) {
         all[String(hostId)] = {
             iconUrl: ((_h = customization.iconUrl) === null || _h === void 0 ? void 0 : _h.trim()) || undefined,
@@ -39,6 +40,7 @@ export function setDeviceCustomization(hostId, customization) {
             shutdownApiUrl: ((_m = customization.shutdownApiUrl) === null || _m === void 0 ? void 0 : _m.trim()) || undefined,
             statusApiUrl: ((_o = customization.statusApiUrl) === null || _o === void 0 ? void 0 : _o.trim()) || undefined,
             f7ApiUrl: (customization.f7ApiUrl && customization.f7ApiUrl.trim()) || undefined,
+            biosApiUrl: (customization.biosApiUrl && customization.biosApiUrl.trim()) || undefined,
         };
     }
     else {

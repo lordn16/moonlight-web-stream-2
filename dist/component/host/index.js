@@ -24,6 +24,7 @@ export class Host {
         this.statusInterval = null;
         this.uptimeInterval = null;
         this.lastF7State = null;
+        this.lastBiosState = null;
         this.isCustomOnline = undefined;
         this.divElement = document.createElement("div");
         this.imageElement = document.createElement("img");
@@ -63,6 +64,7 @@ export class Host {
         this.f7Container = document.createElement("div");
         this.f7Container.classList.add("host-f7-container");
         this.f7Container.style.display = "none";
+        this.f7Container.addEventListener("click", (e) => e.stopPropagation());
         
         this.f7Label = document.createElement("span");
         this.f7Label.innerText = "F7 Script";
@@ -90,6 +92,43 @@ export class Host {
             if (this.lastF7State === enabled) return;
             this.lastF7State = enabled;
             const url = customization.f7ApiUrl
+                .replace(/{enabled}/g, String(enabled))
+                .replace(/{state}/g, enabled ? "on" : "off");
+            this.runSecretApi(url);
+        });
+
+        // BIOS toggle container
+        this.biosContainer = document.createElement("div");
+        this.biosContainer.classList.add("host-f7-container"); // Reuse the switch container styles!
+        this.biosContainer.style.display = "none";
+        this.biosContainer.addEventListener("click", (e) => e.stopPropagation());
+        
+        this.biosLabel = document.createElement("span");
+        this.biosLabel.innerText = "Open BIOS on next Boot";
+        this.biosLabel.classList.add("host-f7-label");
+        
+        this.biosSwitchLabel = document.createElement("label");
+        this.biosSwitchLabel.classList.add("switch");
+        
+        this.biosToggle = document.createElement("input");
+        this.biosToggle.type = "checkbox";
+        
+        this.biosSlider = document.createElement("span");
+        this.biosSlider.classList.add("slider", "round");
+        
+        this.biosSwitchLabel.appendChild(this.biosToggle);
+        this.biosSwitchLabel.appendChild(this.biosSlider);
+        
+        this.biosContainer.appendChild(this.biosLabel);
+        this.biosContainer.appendChild(this.biosSwitchLabel);
+        
+        this.biosToggle.addEventListener("change", () => {
+            const customization = getDeviceCustomization(this.hostId);
+            if (!customization.biosApiUrl) return;
+            const enabled = this.biosToggle.checked;
+            if (this.lastBiosState === enabled) return;
+            this.lastBiosState = enabled;
+            const url = customization.biosApiUrl
                 .replace(/{enabled}/g, String(enabled))
                 .replace(/{state}/g, enabled ? "on" : "off");
             this.runSecretApi(url);
@@ -128,6 +167,7 @@ export class Host {
         this.divElement.appendChild(this.infoElement);
         this.divElement.appendChild(this.statusContainer);
         this.divElement.appendChild(this.f7Container);
+        this.divElement.appendChild(this.biosContainer);
         this.divElement.appendChild(this.btnContainer);
         this.divElement.addEventListener("click", this.onClick.bind(this));
         this.divElement.addEventListener("contextmenu", this.onContextMenu.bind(this));
@@ -470,6 +510,12 @@ export class Host {
         } else {
             this.f7Container.style.display = "none";
         }
+        // Show/hide BIOS Toggle based on biosApiUrl presence
+        if (customization.biosApiUrl) {
+            this.biosContainer.style.display = "flex";
+        } else {
+            this.biosContainer.style.display = "none";
+        }
         
         // Refresh buttons state
         this.updateButtons();
@@ -607,6 +653,12 @@ export class Host {
                         f7Enabled = parseBool(f7Val);
                         this.lastF7State = f7Enabled;
                         this.f7Toggle.checked = f7Enabled;
+                    }
+                    const biosVal = getVal(data, ["bios_enabled", "biosEnabled", "bios_on_boot", "biosOnBoot"]);
+                    if (biosVal !== undefined) {
+                        const biosEnabled = parseBool(biosVal);
+                        this.lastBiosState = biosEnabled;
+                        this.biosToggle.checked = biosEnabled;
                     }
                     uptimeClock = getVal(data, ["pc_uptime_clock", "pcUptimeClock", "uptime_clock", "uptime"]);
                 } else if (typeof data === "string") {
