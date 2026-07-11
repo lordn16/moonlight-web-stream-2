@@ -1021,12 +1021,40 @@ input[type=number] {
     outline-offset: 2px;
 }
 
+.host-element > div {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
 .host-image {
     width: 5cm;
     height: auto;
     border-radius: var(--radius-sm);
     transition: transform var(--dur-med) ease, box-shadow var(--dur-slow) ease, opacity var(--dur-med) ease;
 }
+
+.host-image-overlay {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.host-image-overlay[src=""],
+.host-image-overlay:not([src]),
+.host-image-overlay[src="null"],
+.host-image-overlay[src="undefined"] {
+    display: none;
+}
+
 
 .host-element:hover .host-image {
     transform: scale(1.08);
