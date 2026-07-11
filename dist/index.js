@@ -126,7 +126,7 @@ class MainApp {
         this.hostAddButton.title = "Add Device";
         this.hostAddButton.addEventListener("click", this.addHost.bind(this));
         // Host list
-        this.hostList = new HostList(api, bootstrapRole);
+        this.hostList = new HostList(api, bootstrapRole.role);
         this.hostList.addHostOpenListener(this.onHostOpen.bind(this));
         // Settings Button
         this.settingsButton.classList.add("open-settings");
