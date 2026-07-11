@@ -165,6 +165,8 @@ export const en = {
         statusApiUrlHelp: "Paste URL to query status JSON (online/offline and uptime)",
         f7ApiUrl: "F7 Toggle API URL",
         f7ApiUrlHelp: "Paste URL to toggle F7 (supports {enabled} and {state})",
+        biosApiUrl: "BIOS Toggle API URL",
+        biosApiUrlHelp: "Paste URL to open BIOS on next boot (supports {enabled} and {state})",
         start: "Start",
         forceShutdown: "Force Shutdown",
         details: (host) => `Web Id: ${host.host_id}\n` +
