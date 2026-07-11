@@ -42,6 +42,12 @@
     --dur-fast: 0.18s;
     --dur-med: 0.25s;
     --dur-slow: 0.4s;
+
+    /* Topbar variables */
+    --ml-topbar-height: 60px;
+    --ml-topbar-padding-x: 24px;
+    --ml-topbar-icon-size: 20px;
+    --ml-topbar-icon-button: 36px;
 }
 
 body {
@@ -161,7 +167,14 @@ button:hover:not(:disabled) {
 }
 
 .button-fit-content {
-    height: fit-content;
+    height: var(--ml-topbar-icon-button, 36px) !important;
+    padding: 0 14px !important;
+    font-size: 0.85rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
 }
 
 /* Ensure all button-like controls have polished shadows */
@@ -779,15 +792,22 @@ input[type=number] {
     transition: opacity 0.3s ease-in;
 }
 
-/** Top Line & Controls */
 .top-line {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--ml-topbar-height, 60px);
+    z-index: 1000;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
     align-items: center;
-    gap: var(--space-md);
-    padding: 0 0 0 var(--space-md);
+    justify-content: center; /* Center the title */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15); /* Subtil linje nedtill */
+    background: rgba(10, 10, 12, 0.7); /* Halvtransparent mörk bakgrund */
+    padding: 0 var(--ml-topbar-padding-x, 24px);
+    box-sizing: border-box;
     animation: fadeIn var(--dur-slow) ease;
 }
 
@@ -821,13 +841,37 @@ input[type=number] {
     text-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
 }
 
-
 .top-line-actions {
+    position: absolute;
+    right: var(--ml-topbar-padding-x, 24px);
+    top: 0;
+    bottom: 0;
     display: flex;
-    flex: 1 1;
-    flex-direction: row-reverse;
-    justify-content: right;
-    gap: var(--space-sm);
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Base resets for top bar buttons */
+.top-line button,
+.top-line-actions button,
+.actions-list button {
+    margin: 0 !important;
+}
+
+/* Styling for top bar icon buttons */
+.logout-button,
+.login-button,
+.admin-button,
+.open-settings,
+.host-add,
+.user-button {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    width: var(--ml-topbar-icon-button, 36px) !important;
+    height: var(--ml-topbar-icon-button, 36px) !important;
+    background-size: var(--ml-topbar-icon-size, 20px) !important;
 }
 
 .theme-toggle {
@@ -954,12 +998,11 @@ input[type=number] {
     border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/** Actions */
 .actions-list {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
+    gap: 8px;
 }
 
 /** Settings */

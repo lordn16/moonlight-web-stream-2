@@ -137,7 +137,7 @@ class MainApp {
         this.divElement.addEventListener("close-settings", () => this.setCurrentDisplay("hosts"));
         // Append default elements
         this.divElement.appendChild(this.topLine);
-        this.divElement.appendChild(this.actionElement);
+        this.topLineActions.appendChild(this.actionElement);
         this.setCurrentDisplay("hosts");
         // Context Menu
         document.body.addEventListener("contextmenu", this.onContextMenu.bind(this), { passive: false });

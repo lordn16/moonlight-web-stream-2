@@ -658,23 +658,21 @@ input[type=number] {
 
 /** top line */
 .top-line {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    color: white;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: var(--ml-topbar-height);
+    height: var(--ml-topbar-height, 60px);
     z-index: 1000;
+    display: flex;
     align-items: center;
-    padding: 0 var(--ml-topbar-padding-x);
+    justify-content: center; /* Center the title */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtil linje nedtill */
+    background: rgba(10, 10, 12, 0.7); /* Halvtransparent mörk bakgrund */
+    padding: 0 var(--ml-topbar-padding-x, 20px);
     box-sizing: border-box;
-    background-color: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .top-line>h1 {
@@ -708,23 +706,23 @@ input[type=number] {
 }
 
 .top-line-actions {
-    position: fixed;
-    right: var(--ml-topbar-padding-x);
+    position: absolute;
+    right: var(--ml-topbar-padding-x, 20px);
     top: 0;
-    height: var(--ml-topbar-height);
+    bottom: 0;
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .top-line button,
 .top-line-actions button,
 .actions-list button {
     background-color: transparent;
-    border-radius: 4px;
-    margin: 0;
-    padding: 0;
+    border-radius: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .top-line button:hover,
@@ -773,31 +771,25 @@ input[type=number] {
     margin: 0;
 }
 
-/** Actions */
 .actions-list {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     align-items: center;
-    position: fixed;
-    top: 0;
-    right: calc(var(--ml-topbar-padding-x) + var(--ml-topbar-actions-offset));
-    height: var(--ml-topbar-height);
-    z-index: 1001;
-    gap: 10px;
+    gap: 8px;
     padding: 0;
-    box-sizing: border-box;
+    margin: 0;
 }
 
 .actions-list .button-fit-content {
     width: var(--ml-topbar-icon-button);
-    height: var(--ml-topbar-height);
+    height: var(--ml-topbar-icon-button);
     background-repeat: no-repeat;
     background-position: center;
     background-size: var(--ml-topbar-icon-size);
     color: transparent;
     text-indent: -9999px;
     overflow: hidden;
+    border-radius: 6px;
 
     &[data-variant="save-button"] {
         background-image: url("../resources/save.svg");
