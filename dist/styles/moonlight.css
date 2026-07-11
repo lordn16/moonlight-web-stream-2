@@ -28,7 +28,7 @@ button,
 
 /* Make room for the fixed top bar (non-stream pages) */
 body:not(.stream) {
-    padding-top: calc(var(--ml-topbar-height) + 24px) !important;
+    padding-top: calc(var(--ml-topbar-height) + 48px) !important;
 }
 
 /* Prevent pull down refresh when Streaming */
@@ -451,7 +451,7 @@ input[type=number] {
 .context-menu-background {
     display: block;
     position: fixed;
-    z-index: 1;
+    z-index: 1100;
     border-radius: 5px;
     background-color: rgb(86, 92, 100);
     /** animation */
@@ -1370,9 +1370,10 @@ body.has-bg-image::before {
 }
 
 .settings-close-btn {
-    position: absolute;
-    top: 24px;
+    position: sticky;
+    top: calc(var(--ml-topbar-height, 60px) + 16px);
     right: 24px;
+    float: right;
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;

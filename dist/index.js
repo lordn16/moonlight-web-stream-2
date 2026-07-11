@@ -100,7 +100,7 @@ class MainApp {
             window.location.reload();
         }));
         this.logoutButton.classList.add("logout-button");
-        this.logoutButton.title = "sign out";
+        this.logoutButton.title = "Sign Out";
         this.loginButton.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             const success = yield tryLogin();
             if (success) {
@@ -108,41 +108,40 @@ class MainApp {
             }
         }));
         this.loginButton.classList.add("login-button");
-        this.loginButton.title = "sign in";
+        this.loginButton.title = "Sign In";
         this.adminButton.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             window.location.href = buildUrl("/admin.html");
         }));
         this.adminButton.classList.add("admin-button");
-        this.adminButton.title = "admin";
-        // Actions
-        this.actionElement.classList.add("actions-list");
+        this.adminButton.title = "Admin";
         // Back button
         this.backButton.innerText = I.index.back;
         this.backButton.classList.add("button-fit-content");
         this.backButton.addEventListener("click", backAppState);
         this.backButton.dataset.variant = "back-button";
+        this.backButton.title = "Back";
         // Host add button
         this.hostAddButton.classList.add("host-add");
-        this.hostAddButton.title = "add device";
+        this.hostAddButton.title = "Add Device";
         this.hostAddButton.addEventListener("click", this.addHost.bind(this));
         // Host list
         this.hostList = new HostList(api);
         this.hostList.addHostOpenListener(this.onHostOpen.bind(this));
         // Settings Button
         this.settingsButton.classList.add("open-settings");
-        this.settingsButton.title = "settings";
+        this.settingsButton.title = "Settings";
         this.settingsButton.addEventListener("click", () => this.setCurrentDisplay("settings"));
         this.saveRoleDefaultsButton.innerText = I.settings.saveRoleDefaults;
         this.saveRoleDefaultsButton.classList.add("button-fit-content");
         this.saveRoleDefaultsButton.addEventListener("click", this.onSaveRoleDefaults.bind(this));
         this.saveRoleDefaultsButton.dataset.variant = "save-button";
+        this.saveRoleDefaultsButton.title = "Save Defaults";
         // Settings
         this.settings = new StreamSettingsComponent(bootstrapRole.permissions, getLocalStreamSettings(bootstrapRole.default_settings));
         this.settings.addChangeListener(this.onSettingsChange.bind(this));
         this.divElement.addEventListener("close-settings", () => this.setCurrentDisplay("hosts"));
         // Append default elements
         this.divElement.appendChild(this.topLine);
-        this.topLineActions.appendChild(this.actionElement);
         this.setCurrentDisplay("hosts");
         // Context Menu
         document.body.addEventListener("contextmenu", this.onContextMenu.bind(this), { passive: false });
@@ -264,34 +263,20 @@ class MainApp {
         }
         // Unmount the current display
         if (this.currentDisplay == "hosts") {
-            this.actionElement.removeChild(this.hostAddButton);
-            this.actionElement.removeChild(this.settingsButton);
             this.hostList.unmount(this.divElement);
         }
         else if (this.currentDisplay == "games") {
-            this.actionElement.removeChild(this.backButton);
-            this.actionElement.removeChild(this.settingsButton);
             (_b = this.gameList) === null || _b === void 0 ? void 0 : _b.unmount(this.divElement);
         }
         else if (this.currentDisplay == "settings") {
-            if (this.actionElement.contains(this.backButton)) {
-                this.actionElement.removeChild(this.backButton);
-            }
-            if (this.actionElement.contains(this.saveRoleDefaultsButton)) {
-                this.actionElement.removeChild(this.saveRoleDefaultsButton);
-            }
             (_c = this.settings) === null || _c === void 0 ? void 0 : _c.unmount(this.divElement);
         }
         // Mount the new display
         if (display == "hosts") {
-            this.actionElement.appendChild(this.hostAddButton);
-            this.actionElement.appendChild(this.settingsButton);
             this.hostList.mount(this.divElement);
             setAppState({ display: "hosts" }, pushIntoHistory);
         }
         else if (display == "games" && (extraInfo === null || extraInfo === void 0 ? void 0 : extraInfo.hostId) != null) {
-            this.actionElement.appendChild(this.backButton);
-            this.actionElement.appendChild(this.settingsButton);
             if (((_d = this.gameList) === null || _d === void 0 ? void 0 : _d.getHostId()) != (extraInfo === null || extraInfo === void 0 ? void 0 : extraInfo.hostId)) {
                 this.gameList = new GameList(this.api, extraInfo === null || extraInfo === void 0 ? void 0 : extraInfo.hostId, (_h = extraInfo === null || extraInfo === void 0 ? void 0 : extraInfo.hostCache) !== null && _h !== void 0 ? _h : null);
                 this.gameList.addForceReloadListener(this.forceFetch.bind(this));
@@ -301,13 +286,11 @@ class MainApp {
             setAppState({ display: "games", hostId: (_e = this.gameList) === null || _e === void 0 ? void 0 : _e.getHostId() }, pushIntoHistory);
         }
         else if (display == "settings") {
-            if (((_f = this.user) === null || _f === void 0 ? void 0 : _f.role) == "Admin") {
-                this.actionElement.appendChild(this.saveRoleDefaultsButton);
-            }
             (_g = this.settings) === null || _g === void 0 ? void 0 : _g.mount(this.divElement);
             setAppState({ display: "settings" }, pushIntoHistory);
         }
         this.currentDisplay = display;
+        this.updateTopbarActions();
     }
     forceFetch() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -334,31 +317,66 @@ class MainApp {
     refreshUserRole() {
         return __awaiter(this, void 0, void 0, function* () {
             this.user = yield apiGetUser(this.api);
-            if (this.topLineActions.contains(this.logoutButton)) {
-                this.topLineActions.removeChild(this.logoutButton);
-            }
-            if (this.topLineActions.contains(this.loginButton)) {
-                this.topLineActions.removeChild(this.loginButton);
-            }
-            if (this.topLineActions.contains(this.adminButton)) {
-                this.topLineActions.removeChild(this.adminButton);
-            }
-            if (this.user.role == "Admin") {
-                this.topLineActions.appendChild(this.adminButton);
-                if (this.currentDisplay == "settings" && !this.actionElement.contains(this.saveRoleDefaultsButton)) {
-                    this.actionElement.appendChild(this.saveRoleDefaultsButton);
+            this.updateTopbarActions();
+        });
+    }
+    updateTopbarActions() {
+        this.topLineActions.innerHTML = "";
+        if (this.currentDisplay === "hosts") {
+            // 1. Settings
+            this.topLineActions.appendChild(this.settingsButton);
+            // 2. Sign In / Sign Out
+            if (this.user) {
+                if (this.user.is_default_user) {
+                    this.topLineActions.appendChild(this.loginButton);
+                }
+                else {
+                    this.topLineActions.appendChild(this.logoutButton);
+                }
+                // 3. Admin (if role is Admin)
+                if (this.user.role === "Admin") {
+                    this.topLineActions.appendChild(this.adminButton);
                 }
             }
-            else if (this.actionElement.contains(this.saveRoleDefaultsButton)) {
-                this.actionElement.removeChild(this.saveRoleDefaultsButton);
+            // 4. Add Device
+            this.topLineActions.appendChild(this.hostAddButton);
+        }
+        else if (this.currentDisplay === "games") {
+            // 1. Back button
+            this.topLineActions.appendChild(this.backButton);
+            // 2. Sign In / Sign Out
+            if (this.user) {
+                if (this.user.is_default_user) {
+                    this.topLineActions.appendChild(this.loginButton);
+                }
+                else {
+                    this.topLineActions.appendChild(this.logoutButton);
+                }
+                // 3. Admin (if role is Admin)
+                if (this.user.role === "Admin") {
+                    this.topLineActions.appendChild(this.adminButton);
+                }
             }
-            if (this.user.is_default_user) {
-                this.topLineActions.appendChild(this.loginButton);
+        }
+        else if (this.currentDisplay === "settings") {
+            // 1. Back button
+            this.topLineActions.appendChild(this.backButton);
+            // 2. Sign In / Sign Out
+            if (this.user) {
+                if (this.user.is_default_user) {
+                    this.topLineActions.appendChild(this.loginButton);
+                }
+                else {
+                    this.topLineActions.appendChild(this.logoutButton);
+                }
+                // 3. Admin (if role is Admin)
+                if (this.user.role === "Admin") {
+                    this.topLineActions.appendChild(this.adminButton);
+                    // 4. Save Defaults (if role is Admin)
+                    this.topLineActions.appendChild(this.saveRoleDefaultsButton);
+                }
             }
-            else {
-                this.topLineActions.appendChild(this.logoutButton);
-            }
-        });
+        }
     }
     refreshUserPermissions() {
         return __awaiter(this, void 0, void 0, function* () {

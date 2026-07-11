@@ -113,7 +113,7 @@ class AdminApp {
             window.location.reload();
         }));
         this.logoutButton.classList.add("logout-button");
-        this.logoutButton.title = "sign out";
+        this.logoutButton.title = "Sign Out";
         this.topLineActions.appendChild(this.logoutButton);
         this.userButton.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             window.location.href = buildUrl("/");

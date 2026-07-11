@@ -64,7 +64,7 @@ body {
 }
 
 body:not(.stream) #root {
-    padding-top: calc(var(--ml-topbar-height, 60px) + 24px) !important;
+    padding-top: calc(var(--ml-topbar-height, 60px) + 48px) !important;
     box-sizing: border-box;
 }
 
@@ -577,7 +577,7 @@ input[type=number] {
 .context-menu-background {
     display: block;
     position: fixed;
-    z-index: 1;
+    z-index: 1100;
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(20, 10, 10, 0.98) 0%, rgba(10, 5, 5, 0.98) 100%);
     backdrop-filter: blur(15px);
@@ -1915,9 +1915,10 @@ body.has-bg-image::before {
 }
 
 .settings-close-btn {
-    position: absolute;
-    top: 24px;
+    position: sticky;
+    top: calc(var(--ml-topbar-height, 60px) + 16px);
     right: 24px;
+    float: right;
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
