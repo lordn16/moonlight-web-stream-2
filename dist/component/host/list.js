@@ -70,6 +70,12 @@ export class HostList extends FetchListComponent {
     removeHostOpenListener(listener, options) {
         this.eventTarget.removeEventListener("ml-hostopen", listener, options);
     }
+    updateRole(role) {
+        this.role = role;
+        for (const host of this.list.get()) {
+            host.role = role;
+        }
+    }
     mount(parent) {
         this.list.mount(parent);
     }

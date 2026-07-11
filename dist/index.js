@@ -390,6 +390,12 @@ class MainApp {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield apiGetRole(this.api, { id: null });
             this.role = response.role;
+            // Propagate updated role to all Host components so they can sync customizations
+            this.hostList.updateRole(this.role);
+            // Pull device customizations from server into local storage
+            if (this.role.default_settings && this.role.default_settings.deviceCustomizations) {
+                mergeServerDeviceCustomizations(this.role.default_settings.deviceCustomizations);
+            }
             if (this.role.permissions.allow_add_hosts) {
                 this.hostAddButton.disabled = false;
             }

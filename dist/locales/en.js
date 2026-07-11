@@ -89,6 +89,7 @@ export const en = {
         appearance: "Appearance",
         backgroundImageUrl: "Background Image URL",
         backgroundImageUrlHelp: "Paste direct image link (e.g. from catbox.moe)",
+        showNotifications: "Show Notification Banners",
         deviceStartApiUrl: "Device Start Secret API URL",
         deviceForceShutdownApiUrl: "Device Force Shutdown Secret API URL",
         secretApiHelp: "URLs called via JSON. Use {host_id} or {name} as placeholders.",

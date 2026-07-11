@@ -393,6 +393,11 @@ export class StreamSettingsComponent {
         });
         this.backgroundImageUrl.addChangeListener(this.onSettingsChange.bind(this));
         this.backgroundImageUrl.mount(this.divElement);
+        this.showNotifications = new InputComponent("showNotifications", "checkbox", i.showNotifications || "Show Notification Banners", {
+            checked: (settings === null || settings === void 0 ? void 0 : settings.showNotifications) !== false
+        });
+        this.showNotifications.addChangeListener(this.onSettingsChange.bind(this));
+        this.showNotifications.mount(this.divElement);
         // Secret APIs
         this.secretApiHeader.innerText = "API Options";
         this.divElement.appendChild(this.secretApiHeader);
@@ -466,6 +471,7 @@ export class StreamSettingsComponent {
         settings.hdr = this.hdr.isChecked();
         settings.useSelectElementPolyfill = this.useSelectElementPolyfill.isChecked();
         settings.backgroundImageUrl = this.backgroundImageUrl.getValue();
+        settings.showNotifications = this.showNotifications.isChecked();
         settings.deviceStartApiUrl = this.deviceStartApiUrl.getValue();
         settings.deviceForceShutdownApiUrl = this.deviceForceShutdownApiUrl.getValue();
         try {

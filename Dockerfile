@@ -12,6 +12,10 @@ COPY ./dist/index.js /moonlight-web/static/index.js
 COPY ./dist/styles/index.js /moonlight-web/static/styles/index.js
 COPY ./dist/styles/appearance.js /moonlight-web/static/styles/appearance.js
 
+# 3b. Core JS med tilläggslogik
+COPY ./dist/default_settings.js /moonlight-web/static/default_settings.js
+COPY ./dist/component/notification.js /moonlight-web/static/component/notification.js
+
 # 4. Locale-filer (med våra extra API-URL-keys)
 COPY ./dist/locales/en.js /moonlight-web/static/locales/en.js
 COPY ./dist/locales/fr-FR.js /moonlight-web/static/locales/fr-FR.js

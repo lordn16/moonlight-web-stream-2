@@ -313,10 +313,10 @@ export class Host {
             if (result !== null) {
                 setDeviceCustomization(this.hostId, result);
                 
-                // Automatically sync to server's role defaults if admin
-                try {
-                    const user = this.userCache || (yield apiGetUser(this.api));
-                    if (user && user.role === "Admin" && this.role) {
+                // Sync device customizations to server role (for all users, not just Admin)
+                // This ensures settings are global and shared across devices
+                if (this.role) {
+                    try {
                         const settings = getLocalStreamSettings(this.role.default_settings);
                         const raw = localStorage.getItem("mlDeviceCustomizations");
                         if (raw) {
@@ -331,9 +331,10 @@ export class Host {
                         });
                         this.role.default_settings = settings;
                     }
-                }
-                catch (err) {
-                    console.warn("Failed to auto-save customizations to server:", err);
+                    catch (err) {
+                        // If server rejects (e.g. insufficient permissions), settings stay local only
+                        console.warn("Failed to sync device customizations to server:", err);
+                    }
                 }
 
                 this.forceFetch();

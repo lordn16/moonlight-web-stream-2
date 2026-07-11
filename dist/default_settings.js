@@ -45,6 +45,7 @@ const trueDefaultSettings =
     "useSelectElementPolyfill": false,
     "backgroundImageUrl": "",
     "deviceStartApiUrl": "",
-    "deviceForceShutdownApiUrl": ""
+    "deviceForceShutdownApiUrl": "",
+    "showNotifications": true
 };
 export default trueDefaultSettings;

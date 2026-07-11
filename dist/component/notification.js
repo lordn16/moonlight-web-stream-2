@@ -9,6 +9,14 @@ if (notificationListElement) {
 let alertedNotificationListNotFound = false;
 export function showNotification(message, level = "error", errorObject) {
     console.error(message, errorObject);
+    // Check if notifications are disabled in settings
+    try {
+        const raw = localStorage.getItem("mlSettings");
+        const parsed = raw ? JSON.parse(raw) : null;
+        if (parsed && parsed.showNotifications === false) {
+            return;
+        }
+    } catch (_) { }
     if (!notificationListElement) {
         if (!alertedNotificationListNotFound) {
             alert("couldn't find the notification element");

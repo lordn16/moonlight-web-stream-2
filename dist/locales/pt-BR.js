@@ -89,6 +89,7 @@ export const ptBR = {
         appearance: "Aparência",
         backgroundImageUrl: "URL da Imagem de Fundo",
         backgroundImageUrlHelp: "Cole o link direto da imagem (ex: do catbox.moe)",
+        showNotifications: "Exibir baniửas de notificação",
         deviceStartApiUrl: "URL Secreta da API de Inicialização",
         deviceForceShutdownApiUrl: "URL Secreta da API de Desligamento Forçado",
         secretApiHelp: "URLs chamadas via JSON. Use {host_id} ou {name} como placeholders.",

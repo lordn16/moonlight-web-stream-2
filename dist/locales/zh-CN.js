@@ -89,6 +89,7 @@ export const zhCN = {
         appearance: "外观",
         backgroundImageUrl: "背景图片 URL",
         backgroundImageUrlHelp: "粘贴直接图片链接（例如：上传到 catbox.moe 并粘贴 URL）",
+        showNotifications: "显示通知横幅",
         deviceStartApiUrl: "设备启动秘密 API URL",
         deviceForceShutdownApiUrl: "设备强行关机秘密 API URL",
         secretApiHelp: "通过 JSON 调用的 URL。使用 {host_id} 或 {name} 作为占位符。",

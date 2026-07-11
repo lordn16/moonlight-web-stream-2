@@ -89,6 +89,7 @@ export const frFr = {
         appearance: "Apparence",
         backgroundImageUrl: "URL de l'image de fond",
         backgroundImageUrlHelp: "Coller le lien direct de l'image (ex. de catbox.moe)",
+        showNotifications: "Afficher les bannières de notification",
         deviceStartApiUrl: "URL secrète de l'API de démarrage",
         deviceForceShutdownApiUrl: "URL secrète de l'API d'arrêt forcé",
         secretApiHelp: "URLs appelées via JSON. Utiliser {host_id} ou {name} comme espaces réservés.",
