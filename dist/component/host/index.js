@@ -547,21 +547,69 @@ export class Host {
             this.statusContainer.style.display = "flex";
             try {
                 const res = yield fetch(customization.statusApiUrl);
-                const data = yield res.json();
-                const isOnline = !!data.pc_online;
-                this.statusIndicatorIcon.className = "host-status-custom-icon " + (isOnline ? "online" : "offline");
-                if (data.f7_enabled !== undefined) {
-                    this.lastF7State = !!data.f7_enabled;
-                    this.f7Toggle.checked = !!data.f7_enabled;
+                const text = yield res.text();
+                console.log(`Moonlight Status API raw response for host ${this.hostId}:`, text);
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    data = text;
                 }
-                if (isOnline && data.pc_uptime_clock) {
-                    this.startUptimeTimer(data.pc_uptime_clock);
+
+                const parseBool = (val) => {
+                    if (val === undefined || val === null) return false;
+                    if (typeof val === "boolean") return val;
+                    if (typeof val === "number") return val !== 0;
+                    if (typeof val === "string") {
+                        const s = val.trim().toLowerCase();
+                        return s === "true" || s === "1" || s === "on" || s === "yes" || s === "enabled" || s === "online";
+                    }
+                    return !!val;
+                };
+
+                let isOnline = false;
+                let f7Enabled = false;
+                let uptimeClock = null;
+
+                if (data && typeof data === "object") {
+                    const getVal = (obj, keys) => {
+                        for (const k of keys) {
+                            if (obj[k] !== undefined) return obj[k];
+                            const lowerK = k.toLowerCase();
+                            for (const actualKey in obj) {
+                                if (actualKey.toLowerCase() === lowerK) {
+                                    return obj[actualKey];
+                                }
+                            }
+                        }
+                        return undefined;
+                    };
+
+                    isOnline = parseBool(getVal(data, ["pc_online", "pcOnline", "online"]));
+                    
+                    const f7Val = getVal(data, ["f7_enabled", "f7Enabled"]);
+                    if (f7Val !== undefined) {
+                        f7Enabled = parseBool(f7Val);
+                        this.lastF7State = f7Enabled;
+                        this.f7Toggle.checked = f7Enabled;
+                    }
+                    
+                    uptimeClock = getVal(data, ["pc_uptime_clock", "pcUptimeClock", "uptime_clock", "uptime"]);
+                } else if (typeof data === "string") {
+                    isOnline = parseBool(data);
+                }
+
+                this.statusIndicatorIcon.className = "host-status-custom-icon " + (isOnline ? "online" : "offline");
+                
+                if (isOnline && uptimeClock) {
+                    this.startUptimeTimer(String(uptimeClock));
                 } else {
                     this.stopUptimeTimer();
-                    this.statusUptimeClock.innerText = "Offline";
+                    this.statusUptimeClock.innerText = isOnline ? "Online" : "Offline";
                 }
             } catch (err) {
-                console.error("Status check failed:", err);
+                console.error(`Moonlight Status check failed for host ${this.hostId}. If this is a network/fetch error, please check if CORS is enabled on your API server. Error:`, err);
                 this.statusIndicatorIcon.className = "host-status-custom-icon offline";
                 this.stopUptimeTimer();
                 this.statusUptimeClock.innerText = "Offline";
